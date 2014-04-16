@@ -10,24 +10,35 @@ module.exports = function(grunt) {
   'use strict';
 
   var docpad = require('docpad');
+  var watchFull = ['server', 'watch', 'run'];
 
-  grunt.registerTask('docs', 'Compile with DocPad', function() {
+  function isWatch(action) {
+    return action.split(/ +/).some(function(action) {
+      return watchFull.indexOf(action) > -1;
+    });
+  }
+
+  grunt.registerMultiTask('docpad', 'Compile with DocPad', function () {
     var done = this.async();
-    var config = grunt.config(this.name || 'docs');
+    var options = this.options({});
+    var action = (this.data.action || 'generate');
 
     // To allow paths config to use patterns
-    Object.keys(config).forEach(function(key) {
+    Object.keys(options).forEach(function (key) {
       if (key.slice(-5) === 'Paths') {
-        config[key] = grunt.file.expand(config[key]);
+        options[key] = grunt.file.expand(options[key]);
       }
     });
 
-    docpad.createInstance(config, function(err, inst) {
-      inst.action('generate', function(err) {
+    docpad.createInstance(options, function (err, inst) {
+      if (err) {  return grunt.warn(err); }
+
+      inst.action(action, function (err) {
         if (err) { return grunt.warn(err); }
-        done();
+        if (!isWatch(action)) {
+          done();
+        }
       });
     });
   });
-
 };
