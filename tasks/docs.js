@@ -18,7 +18,7 @@ module.exports = function(grunt) {
     });
   }
 
-  grunt.registerMultiTask('docpad', 'Compile with DocPad', function () {
+  grunt.registerMultiTask('docs', 'Compile with DocPad', function () {
     var done = this.async();
     var options = this.options({});
     var action = (this.data.action || 'generate');
